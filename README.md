@@ -21,4 +21,4 @@ Or just install them yourself
 
 **__Have fun!__**
 
->It should be compatible with windows but i have to try yet
+>It should be compatible with windows but i have to try it yet
