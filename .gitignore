@@ -1,0 +1,6 @@
+#Any .wav file will be ignored
+*.wav
+
+#Ignore executable
+visualizer
+
