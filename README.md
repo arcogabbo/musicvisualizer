@@ -1,6 +1,8 @@
 ## C and SDL music visualizer
 
-![Example](gif/example.gif)
+<p align="center">
+    <img src="gif/example.gif">
+</p>
 
 This simple real-time visualizer calculates the dft of a given stream and output the magnitude of his frequencies
 
