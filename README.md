@@ -4,7 +4,7 @@
     <img src="gif/example.gif">
 </p>
 
-This simple real-time visualizer calculates the dft of a given stream and output the magnitude of his frequencies
+This simple real-time visualizer calculates the dft of a given stream and outputs the magnitudes
 
 Sample usage with given options size and file (if you avoid the size it will be 2048 by default):
 
@@ -21,8 +21,8 @@ You can easily find those in Arch extra packages:
 sudo pacman -S sdl2
 sudo pacman -S fftw
 ```
-Or just install them yourself
+Or just install them yourself.
 
 **__Have fun!__**
 
->It should be compatible with windows but i have to try it yet
+>It's not compatible with windows because the pthread API is different.
