@@ -11,7 +11,7 @@ int main(int argc,char* argv[])
 
     //options arguments
     int option_index=0;
-    char* file_stream;
+    char* file_stream=NULL;
     //boolean like variable to pause or resume the program
     int running=1;
     int playing=0;
@@ -44,6 +44,12 @@ int main(int argc,char* argv[])
                 printf("Option error\n");
                 exit(1);
         }
+    }
+
+    if(file_stream==NULL)
+    {
+        printf("You need to specify a file\n");
+        exit(1);
     }
     //memory allocation for the arrays
     audio->in=(fftw_complex*)fftw_malloc(sizeof(fftw_complex)*NSAMPLES);
