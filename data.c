@@ -45,7 +45,9 @@ void* visualizerOutput(void* arg)
     struct wrapper* wrap=(struct wrapper*)arg;
     double max[BARS];
     double multiplier;
-    int maxIndex;
+    int window_size=2;
+    int count=0;
+    int sum;
     //double freq_bin[BARS+1] = {19.0,140.0,250.0,400.0,500.0,600.0,700.0,800.0,1000.0,1500.0,(double)SAMPLE_RATE/2};
     double freq_bin[BARS+1];
     double re,im;
@@ -80,7 +82,7 @@ void* visualizerOutput(void* arg)
     
     fftw_execute(wrap->audio->plan);
     
-
+    //calculate magnitudes
     for(int j=0;j < NSAMPLES/2;j++)
     {
         re=wrap->audio->out[j][0];
@@ -95,6 +97,26 @@ void* visualizerOutput(void* arg)
                 if(magnitude > max[i]) 
                     max[i]=magnitude;
     }
+    
+    //simple moving window average algorithm(hole scene smoother)
+    /*for(int i=0;i<BARS;i++)
+    {
+        if(count<window_size)
+            count++;
+        sum=max[i];
+        
+        if(i+count < BARS)
+            for(int j=0;j<count;j++)
+                sum+=max[i+j];
+        else
+            count-=window_size;
+    
+        if(i-count > 0)
+            for(int j=0;j<count;j++)
+                sum+=max[i-j];
+
+        max[i]=sum/(count*2+1);
+    }*/
 
     SDL_SetRenderDrawColor(wrap->audio->renderer,0,0,0,0);
     SDL_RenderClear(wrap->audio->renderer);
@@ -117,13 +139,16 @@ void* visualizerOutput(void* arg)
                                 wrap->audio->color->g,
                                 wrap->audio->color->b,
                                 255); 
+        
+        if(max[i]>2.0)
+            max[i]=log(max[i]);
 
         for(int j=0;j<THICKNESS;j++)
             SDL_RenderDrawLine(wrap->audio->renderer, 
                                 startx+(i*DISTANCE+j),
                                 starty,
                                 startx+(i*DISTANCE+j),
-                                starty-(FIT_FACTOR*log(max[i])));
+                                starty-(FIT_FACTOR*max[i]));
     }
 
     colorstart+=2;

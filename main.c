@@ -114,7 +114,7 @@ int main(int argc,char* argv[])
         if(delta > time_per_frame)
             fps=1000/delta;
 
-        printf("FPS:%i\n",fps);
+        //printf("FPS:%i\n",fps);
 
         while(SDL_PollEvent(&event))
         {
