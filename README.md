@@ -4,6 +4,12 @@
     <img src="gif/example.gif">
 </p>
 
+`NEW:Change to time domain mode with m key`
+<p align="center">
+    <img src="gif/time_domain_mode.gif">
+</p>
+
+
 This simple real-time visualizer calculates the dft of a given stream and outputs the magnitudes
 
 Sample usage with given options size and file (if you avoid the size it will be 2048 by default):
