@@ -15,7 +15,8 @@ int main(int argc,char* argv[])
     //boolean like variable to pause or resume the program
     int running=1;
     int playing=0;
-        
+    MODE=0;
+
     //SDL DECLARATIONS
     SDL_AudioSpec wav_spec;
     SDL_AudioSpec obtained;
@@ -55,6 +56,7 @@ int main(int argc,char* argv[])
     audio->in=(fftw_complex*)fftw_malloc(sizeof(fftw_complex)*NSAMPLES);
     audio->out=(fftw_complex*)fftw_malloc(sizeof(fftw_complex)*NSAMPLES);
     audio->color=(struct RGB*)malloc(sizeof(struct RGB));
+    audio->time_domain=(SDL_Point*)malloc(sizeof(SDL_Point)*NSAMPLES);
 
 
     //planning the forward discrete fourier transformation in 1 dimension
@@ -70,7 +72,7 @@ int main(int argc,char* argv[])
         exit(1);
 
     win=SDL_CreateWindow("Hello",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,WIDTH,HEIGHT,SDL_WINDOW_OPENGL);
-    audio->renderer=SDL_CreateRenderer(win,-1,0);
+    audio->renderer=SDL_CreateRenderer(win,-1,SDL_RENDERER_ACCELERATED);
     
     if(SDL_LoadWAV(file_stream,&wav_spec,&wav_buffer,&wav_length) == NULL)
     {
@@ -129,12 +131,11 @@ int main(int argc,char* argv[])
                         running=0;
                         break;
                     case SDLK_p:
-                        if(playing)
-                            playing=0;
-                        else
-                            playing=1;
-
+                        playing=!playing;
                         SDL_PauseAudioDevice(device,playing);
+                        break;
+                    case SDLK_m:
+                        MODE=!MODE;
                         break;
                 }
             }

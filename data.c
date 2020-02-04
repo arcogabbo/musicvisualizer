@@ -51,12 +51,14 @@ void* visualizerOutput(void* arg)
     //double freq_bin[BARS+1] = {19.0,140.0,250.0,400.0,500.0,600.0,700.0,800.0,1000.0,1500.0,(double)SAMPLE_RATE/2};
     double freq_bin[BARS+1];
     double re,im;
+    float CONSTANT=(float)NSAMPLES/WIDTH;
     float freq;
     double magnitude;
     int startx=0,starty=HEIGHT;
     struct HSV hsv;
     static int colorstart=0;
 
+    //construct a range of frequencies based on NSAMPLES
     for(int i=0;i<BARS;i++)
     {
         max[i]=1.7E-308;
@@ -79,80 +81,124 @@ void* visualizerOutput(void* arg)
         wrap->stream+=2;
     }
 
-    
-    fftw_execute(wrap->audio->plan);
-    
-    //calculate magnitudes
-    for(int j=0;j < NSAMPLES/2;j++)
+    //time domain visualizer (TESTING)
+    if(MODE)
     {
-        re=wrap->audio->out[j][0];
-        im=wrap->audio->out[j][1];
-
-        magnitude=sqrt((re*re)+(im*im));
-        
-        freq=j*((double)SAMPLE_RATE/NSAMPLES);
-
-        for(int i=0;i < BARS;i++)
-            if((freq>freq_bin[i]) && (freq<=freq_bin[i+1]))
-                if(magnitude > max[i]) 
-                    max[i]=magnitude;
-    }
-    
-    //simple moving window average algorithm(hole scene smoother)
-    /*for(int i=0;i<BARS;i++)
-    {
-        if(count<window_size)
-            count++;
-        sum=max[i];
-        
-        if(i+count < BARS)
-            for(int j=0;j<count;j++)
-                sum+=max[i+j];
-        else
-            count-=window_size;
-    
-        if(i-count > 0)
-            for(int j=0;j<count;j++)
-                sum+=max[i-j];
-
-        max[i]=sum/(count*2+1);
-    }*/
-
-    SDL_SetRenderDrawColor(wrap->audio->renderer,0,0,0,0);
-    SDL_RenderClear(wrap->audio->renderer);
-
-    //SDL_SetRenderDrawColor(audio->renderer,255,0,0,255);
-    //effects techniques
-    //max[i]=f(max[i])
-    //
-    //normal:       f(x)=FIT_FACTOR*x
-    //exponential:  f(x)=log(x*FIT_FACTOR2)*FIT_FACTOR
-    //multiPeak:    f(x)=x/Peak[i]*FIT_FACTOR
-    //maxPeak:      f(x)=x/Global_Peak*FIT_FACTOR
-    for(int i=0;i<BARS;i++)
-    {
-        hsv.h=( (i * 2) + colorstart) % 360;
+        //
+        //
+        //INIT TIME DOMAIN MODE
+        //
+        //
+        SDL_SetRenderDrawColor(wrap->audio->renderer,0,0,0,0);
+        SDL_RenderClear(wrap->audio->renderer);
+        hsv.h=( 2 + colorstart) % 360;
         hsv.s=hsv.v=1.0;
         conversion(hsv,wrap->audio->color);
         SDL_SetRenderDrawColor(wrap->audio->renderer,
-                                wrap->audio->color->r,
-                                wrap->audio->color->g,
-                                wrap->audio->color->b,
-                                255); 
-        
-        if(max[i]>2.0)
-            max[i]=log(max[i]);
-
-        for(int j=0;j<THICKNESS;j++)
-            SDL_RenderDrawLine(wrap->audio->renderer, 
-                                startx+(i*DISTANCE+j),
-                                starty,
-                                startx+(i*DISTANCE+j),
-                                starty-(FIT_FACTOR*max[i]));
+                                    wrap->audio->color->r,
+                                    wrap->audio->color->g,
+                                    wrap->audio->color->b,
+                                    255);
+        for(int i=0;i<NSAMPLES;i++)
+        {
+            wrap->audio->time_domain[i].x=i/CONSTANT;
+            wrap->audio->time_domain[i].y=300-wrap->audio->in[i][0]*70;
+        }
+        SDL_RenderDrawLines(wrap->audio->renderer,wrap->audio->time_domain,NSAMPLES);
+        //
+        //
+        //ENDING TIME DOMAIN MODE
+        //
+        //
     }
+    else
+    {
+        //
+        //
+        //INIT BARS MODE
+        //
+        //
+        fftw_execute(wrap->audio->plan);
+        
+        //calculate magnitudes
+        for(int j=0;j < NSAMPLES/2;j++)
+        {
+            re=wrap->audio->out[j][0];
+            im=wrap->audio->out[j][1];
 
+            magnitude=sqrt((re*re)+(im*im));
+            
+            freq=j*((double)SAMPLE_RATE/NSAMPLES);
+
+            for(int i=0;i < BARS;i++)
+                if((freq>freq_bin[i]) && (freq<=freq_bin[i+1]))
+                    if(magnitude > max[i]) 
+                        max[i]=magnitude;
+        }
+    
+        //simple moving window average algorithm(hole scene smoother)
+        /*for(int i=0;i<BARS;i++)
+        {
+            if(count<window_size)
+                count++;
+            sum=max[i];
+            
+            if(i+count < BARS)
+                for(int j=0;j<count;j++)
+                    sum+=max[i+j];
+            else
+                count-=window_size;
+        
+            if(i-count > 0)
+                for(int j=0;j<count;j++)
+                    sum+=max[i-j];
+
+            max[i]=sum/(count*2+1);
+        }*/
+
+        SDL_SetRenderDrawColor(wrap->audio->renderer,0,0,0,0);
+        SDL_RenderClear(wrap->audio->renderer);
+
+        //SDL_SetRenderDrawColor(audio->renderer,255,0,0,255);
+        //effects techniques
+        //max[i]=f(max[i])
+        //
+        //normal:       f(x)=FIT_FACTOR*x
+        //exponential:  f(x)=log(x*FIT_FACTOR2)*FIT_FACTOR
+        //multiPeak:    f(x)=x/Peak[i]*FIT_FACTOR
+        //maxPeak:      f(x)=x/Global_Peak*FIT_FACTOR
+        //TODO: substitute this whole system with SDL_DrawRects for performance
+        //int SDL_RenderDrawRects(SDL_Renderer* renderer, const SDL_Rect* rects,int count)
+        for(int i=0;i<BARS;i++)
+        {
+            hsv.h=( (i * 2) + colorstart) % 360;
+            hsv.s=hsv.v=1.0;
+            conversion(hsv,wrap->audio->color);
+            SDL_SetRenderDrawColor(wrap->audio->renderer,
+                                    wrap->audio->color->r,
+                                    wrap->audio->color->g,
+                                    wrap->audio->color->b,
+                                    255); 
+            
+            if(max[i]>2.0)
+                max[i]=log(max[i]);
+
+            for(int j=0;j<THICKNESS;j++)
+                SDL_RenderDrawLine(wrap->audio->renderer,
+                                    startx+(i*DISTANCE+j),
+                                    starty,
+                                    startx+(i*DISTANCE+j),
+                                    starty-(FIT_FACTOR*max[i]));
+        }
+        
+        //
+        //
+        //ENDING BARS MODE
+        //
+        //
+    }
     colorstart+=2;
     SDL_RenderPresent(wrap->audio->renderer);
     
     sem_post(&play);
-}
+} 

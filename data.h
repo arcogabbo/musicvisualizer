@@ -29,6 +29,7 @@ struct AudioData
     fftw_complex *out;
     SDL_Renderer *renderer;
     struct RGB* color; 
+    SDL_Point* time_domain;
 };
 
 struct wrapper
@@ -40,6 +41,7 @@ struct wrapper
 sem_t play;
 //no MUTEX on this int because only data.c->visualizerOutput uses it;
 int NSAMPLES;
+int MODE;
 
 void myCallback(void*,Uint8*,int);
 double Get16bitAudioSample(Uint8*,SDL_AudioFormat);
