@@ -15,7 +15,7 @@ int main(int argc,char* argv[])
     //boolean like variable to pause or resume the program
     int running=1;
     int playing=0;
-    MODE=0;
+    MODE=1;
 
     //SDL DECLARATIONS
     SDL_AudioSpec wav_spec;
@@ -37,6 +37,7 @@ int main(int argc,char* argv[])
         {
             case 's':
                 NSAMPLES=atoi(optarg);
+                printf("%d\n",NSAMPLES);
                 break;
             case 'f':
                 file_stream=optarg;
@@ -128,6 +129,7 @@ int main(int argc,char* argv[])
                 switch(event.key.keysym.sym)
                 {
                     case SDLK_q:
+                        playing=1;
                         running=0;
                         break;
                     case SDLK_p:

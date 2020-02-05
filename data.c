@@ -15,8 +15,7 @@ void myCallback(void* userData,Uint8* stream,int len)
     pthread_create(&th,NULL,visualizerOutput,(void*)&wrap);
 
     Uint32 length=(Uint32) len;
-    length=(length > audio->length?audio->length:length);
-    
+    length=(length > audio->length?audio->length:length); 
 
     sem_wait(&play);
     SDL_memcpy(stream,audio->position,length);
@@ -99,12 +98,15 @@ void* visualizerOutput(void* arg)
                                     wrap->audio->color->g,
                                     wrap->audio->color->b,
                                     255);
+        printf("1 entro ciclo\n");
         for(int i=0;i<NSAMPLES;i++)
         {
             wrap->audio->time_domain[i].x=i/CONSTANT;
             wrap->audio->time_domain[i].y=300-wrap->audio->in[i][0]*70;
         }
+        printf("2 esco ciclo\n");
         SDL_RenderDrawLines(wrap->audio->renderer,wrap->audio->time_domain,NSAMPLES);
+        printf("3 disegno\n");
         //
         //
         //ENDING TIME DOMAIN MODE
@@ -190,7 +192,6 @@ void* visualizerOutput(void* arg)
                                     startx+(i*DISTANCE+j),
                                     starty-(FIT_FACTOR*max[i]));
         }
-        
         //
         //
         //ENDING BARS MODE
@@ -198,7 +199,6 @@ void* visualizerOutput(void* arg)
         //
     }
     colorstart+=2;
-    SDL_RenderPresent(wrap->audio->renderer);
-    
+    SDL_RenderPresent(wrap->audio->renderer); 
     sem_post(&play);
 } 
