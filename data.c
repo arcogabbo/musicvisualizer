@@ -98,15 +98,15 @@ void* visualizerOutput(void* arg)
                                     wrap->audio->color->g,
                                     wrap->audio->color->b,
                                     255);
-        printf("1 entro ciclo\n");
+        //printf("1 entro ciclo\n");
         for(int i=0;i<NSAMPLES;i++)
         {
             wrap->audio->time_domain[i].x=i/CONSTANT;
             wrap->audio->time_domain[i].y=300-wrap->audio->in[i][0]*70;
         }
-        printf("2 esco ciclo\n");
+        //printf("2 esco ciclo\n");
         SDL_RenderDrawLines(wrap->audio->renderer,wrap->audio->time_domain,NSAMPLES);
-        printf("3 disegno\n");
+        //printf("3 disegno\n");
         //
         //
         //ENDING TIME DOMAIN MODE
