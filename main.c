@@ -137,7 +137,7 @@ int main(int argc,char* argv[])
                         SDL_PauseAudioDevice(device,playing);
                         break;
                     case SDLK_m:
-                        MODE=!MODE;
+                        changeMode();
                         break;
                 }
             }

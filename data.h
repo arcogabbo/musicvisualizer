@@ -38,12 +38,13 @@ struct wrapper
     struct AudioData* audio;
 };
 
-sem_t play;
+static sem_t play;
 //no MUTEX on this int because only data.c->visualizerOutput uses it;
-int NSAMPLES;
-int MODE;
+static int NSAMPLES;
+static int MODE;
 
 void myCallback(void*,Uint8*,int);
 double Get16bitAudioSample(Uint8*,SDL_AudioFormat);
 void* visualizerOutput(void*);
+void changeMode();
 #endif

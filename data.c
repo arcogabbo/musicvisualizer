@@ -56,6 +56,9 @@ void* visualizerOutput(void* arg)
     int startx=0,starty=HEIGHT;
     struct HSV hsv;
     static int colorstart=0;
+    
+    if(!NSAMPLES)
+        NSAMPLES=2048;
 
     //construct a range of frequencies based on NSAMPLES
     for(int i=0;i<BARS;i++)
@@ -202,3 +205,8 @@ void* visualizerOutput(void* arg)
     SDL_RenderPresent(wrap->audio->renderer); 
     sem_post(&play);
 } 
+
+void changeMode()
+{
+    MODE=!MODE;
+}
